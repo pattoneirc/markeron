@@ -19,6 +19,8 @@ mod shortcuts;
 mod single_instance_win;
 mod theme;
 #[cfg(target_os = "windows")]
+mod video_compat;
+#[cfg(target_os = "windows")]
 mod win32;
 
 use std::sync::Mutex;
@@ -277,6 +279,11 @@ pub fn run() {
             theme::start_windows_tray_theme_watcher(&handle);
 
             theme::apply_app_theme(&handle, &loaded.general.theme);
+
+            #[cfg(target_os = "windows")]
+            if let Some(window) = handle.get_webview_window("overlay") {
+                video_compat::configure_overlay(&window);
+            }
 
             setup_overlay_size(&handle);
 
